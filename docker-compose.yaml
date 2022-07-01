@@ -1,0 +1,33 @@
+services:
+  minecraft:
+    image: itzg/minecraft-server
+    environment:
+      EULA: true
+      TYPE: BUKKIT
+      VERSION: 1.19
+    ports:
+      - "25565:25565"
+    volumes:
+      - "server:/data"
+    labels:
+      - traefik.enable: true
+      - traefik.tcp.routers.minecraft.rule: HostSNI(`minecraft.app.danielr1996.de`)
+        
+rcon:
+    image: itzg/rcon
+    ports:
+      - "4326:4326"
+      - "4327:4327"
+    environment:
+      RWA_USERNAME: admin
+      RWA_PASSWORD: admin
+      RWA_ADMIN: "TRUE"
+      RWA_RCON_HOST: minecraft
+      #RWA_RCON_PORT: 28016
+      RWA_RCON_PASSWORD: minecraft
+volumes:
+   server:
+     driver_opts:
+       type: "nfs"
+       o: "addr=10.0.0.5,nolock,soft,rw"
+       device: ":/mnt/user/compose-data/minecraft/server"
